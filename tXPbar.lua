@@ -7,6 +7,17 @@ Dragonflight.
 
 MainMenuExpBar:SetAlpha(0) -- Required for XPbar.lua to work
 
+-- MainMenuXPBarTexture0/1 and MainMenuMaxLevelBar0/1 are deliberately LEFT
+-- ALONE. They are the metal chrome around the XP bar, and in vanilla that
+-- chrome is the bottom section of the whole main bar assembly - blanking them
+-- takes a wide metallic band out from under the action buttons and leaves the
+-- bar looking like a thin dark strip.
+--
+-- They were blanked here for a while to stop the default XP bar showing when
+-- the action bar was moved away from it. That is no longer what fixes it: Edit
+-- Mode's `attach` list moves MainMenuExpBar with the bar, so the chrome travels
+-- along and never gets stranded in the first place.
+
 tDFUI_config = tDFUI_config or {}
 tDFUI_config["Hide XP outdoors"] = tDFUI_config["Hide XP outdoors"] or 0
 tDFUI_config["Always show detailed XP"] = tDFUI_config["Always show detailed XP"] or 0

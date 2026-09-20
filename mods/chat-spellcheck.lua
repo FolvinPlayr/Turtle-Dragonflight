@@ -251,13 +251,13 @@ function tDF_SpellcheckCommand(args)
     tDF_dictionary[word] = true
     personal[word] = true
     verdict[word] = false
-    DEFAULT_CHAT_FRAME:AddMessage("|cff008000t|cff1974d2DF|r: added |cffffff00" .. word .. "|r to your dictionary.")
+    tDFUI.Print("added |cffffff00" .. word .. "|r to your dictionary.")
 
   elseif action == "remove" and word ~= "" then
     tDF_dictionary[word] = nil
     personal[word] = nil
     verdict[word] = nil
-    DEFAULT_CHAT_FRAME:AddMessage("|cff008000t|cff1974d2DF|r: removed |cffffff00" .. word .. "|r from your dictionary.")
+    tDFUI.Print("removed |cffffff00" .. word .. "|r from your dictionary.")
 
   elseif action == "list" then
     local list, count = "", 0
@@ -265,11 +265,11 @@ function tDF_SpellcheckCommand(args)
       count = count + 1
       list = (list == "" and entry) or (list .. ", " .. entry)
     end
-    DEFAULT_CHAT_FRAME:AddMessage("|cff008000t|cff1974d2DF|r: " .. count ..
+    tDFUI.Print(count ..
       " word(s) in your dictionary. |cffaaaaaa" .. list .. "|r")
 
   else
-    DEFAULT_CHAT_FRAME:AddMessage("|cff008000t|cff1974d2DF|r: |cffffff00/tdf dict add|remove <word>|r, or |cffffff00/tdf dict list|r")
+    tDFUI.Print("|cffffff00/tdf dict add|remove <word>|r, or |cffffff00/tdf dict list|r")
   end
 end
 

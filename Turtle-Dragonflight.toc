@@ -4,7 +4,7 @@
 ## Notes: The Dragonflight UI for Turtle WoW.
 ## Version: 3.0
 ## DefaultState: enabled
-## SavedVariables: SUCC_bagOptions, tDF_radioProbe, tDF_dictionary
+## SavedVariables: SUCC_bagOptions, tDF_radioProbe, tDF_dictionary, tDF_editProfiles
 ## SavedVariablesPerCharacter: tDFUI_config, tDFUI_cache, SortBagsRightToLeft
 
 # locales
@@ -99,6 +99,8 @@ mods\minimap-smaller.lua
 mods\minimap-bigger.lua
 mods\tTimers.lua
 mods\tAutoRep.lua
+mods\tBarLayout.lua
+mods\tEditMode.lua
 
 #Turtle Dragonflight
 tMinimap.lua

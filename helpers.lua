@@ -76,6 +76,60 @@ tDFUI.GetExpansion = function()
   end
 end
 
+-- Addon chat output. One definition so the prefix lives in one place; every
+-- module that talks to the user goes through this rather than pasting the
+-- colour codes again.
+tDFUI.Print = function(msg)
+  DEFAULT_CHAT_FRAME:AddMessage("|cff008000t|cff1974d2DF|r: " .. tostring(msg))
+end
+
+-- Run `func` once a second for `passes` passes after every PLAYER_ENTERING_WORLD.
+--
+-- Several modules build their frames inside their own enable function, and
+-- main.lua enables modules in pairs() order, so anything that has to see other
+-- modules' frames cannot assume they exist yet. Blizzard's own layout pass also
+-- moves frames after VARIABLES_LOADED, and whoever writes last wins - so the
+-- work is repeated a few times rather than done once and hoped over.
+tDFUI.RetryAfterLogin = function(passes, func)
+  local loader = CreateFrame("Frame", nil, UIParent)
+  loader.passes = 0
+  loader.elapsed = 0
+  loader:RegisterEvent("PLAYER_ENTERING_WORLD")
+
+  loader:SetScript("OnEvent", function()
+    this.passes = 0
+    this.elapsed = 0
+    this:Show()
+  end)
+
+  loader:SetScript("OnUpdate", function()
+    this.elapsed = this.elapsed + arg1
+    if this.elapsed < 1 then return end
+
+    this.elapsed = 0
+    this.passes = this.passes + 1
+    func()
+
+    if this.passes >= passes then this:Hide() end
+  end)
+
+  return loader
+end
+
+-- True once Edit Mode holds an explicit position for this frame.
+--
+-- Anything that re-anchors a frame from a hook or an OnUpdate has to ask this
+-- first. tReducedActionBar.lua re-places half the bottom of the UI every time
+-- UIParent_ManageFramePositions runs, and re-anchors the stance bar on every
+-- single frame - so without this check a frame the user placed by hand gets
+-- dragged straight back, or worse, ends up held by two opposing anchor points
+-- at once, which is what left the stance bar drawn nowhere near its overlay.
+tDFUI.IsPlaced = function(name)
+  if tDF_EditMode and tDF_EditMode.IsPlaced then
+    return tDF_EditMode.IsPlaced(name)
+  end
+end
+
 tDFUI.HookScript = function(f, script, func)
   -- GetScript raises on a script name the frame doesn't support, rather than
   -- returning nil, so probe it safely: a script type this client doesn't have

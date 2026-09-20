@@ -11,6 +11,11 @@ local max_height = 500
 local settings = CreateFrame("Frame", "AdvancedSettingsGUI", UIParent)
 settings:Hide()
 
+-- This panel never declared a strata, so it inherited UIParent's and ended up
+-- underneath anything on MEDIUM - the action bar gryphons included. Every other
+-- panel the game opens sits on DIALOG, so put it where it belongs.
+settings:SetFrameStrata("DIALOG")
+
 table.insert(UISpecialFrames, "AdvancedSettingsGUI")
 settings:SetScript("OnHide", function()
   ShowUIPanel(GameMenuFrame)
@@ -97,6 +102,7 @@ settings.defaults:SetScript("OnClick", function()
   settings:defaults()
 end)
 
+
 local opposite_table =
 {
   ["Colorful MicroMenu"] = {"Gray MicroMenu"},
@@ -128,7 +134,8 @@ settings.load = function(self)
   -- sort all configs into categories
   local gui = {}
   for title, module in pairs(tDFUI.mods) do
-    if module.expansions[expansion] then
+    -- `hidden` modules are always-on infrastructure; they get no checkbox
+    if module.expansions[expansion] and not module.hidden then
       local category = module.category or T["General"]
       gui[category] = gui[category] or {}
       gui[category][title] = module
@@ -264,5 +271,25 @@ advanced:SetScript("OnClick", function()
   settings:Show()
 end)
 
+-- Edit Mode sits directly under the options button in the game menu. The module
+-- publishes tDF_EditMode_Toggle when it is enabled, so this stays harmless if
+-- the user switched the module off.
+local editmode = CreateFrame("Button", "GameMenuButtonEditMode", GameMenuFrame, "GameMenuButtonTemplate")
+editmode:SetPoint("TOP", advanced, "BOTTOM", 0, -1)
+editmode:SetText(T["|cff008000t|cff1974d2DF"] .. " |cffffffffEdit Mode")
+editmode:SetScript("OnClick", function()
+  HideUIPanel(GameMenuFrame)
+
+  if tDF_EditMode_Toggle then
+    tDF_EditMode_Toggle()
+  else
+    tDFUI.Print("enable the Edit Mode module in " ..
+      T["|cff008000t|cff1974d2DF"] .. " |cffffffffOptions|r first.")
+  end
+end)
+
+-- grow the menu by exactly the button we just added, rather than guessing
+GameMenuFrame:SetHeight(GameMenuFrame:GetHeight() + editmode:GetHeight() + 1)
+
 GameMenuButtonKeybindings:ClearAllPoints()
-GameMenuButtonKeybindings:SetPoint("TOP", advanced, "BOTTOM", 0, -1)
+GameMenuButtonKeybindings:SetPoint("TOP", editmode, "BOTTOM", 0, -1)

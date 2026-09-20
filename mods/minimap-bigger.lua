@@ -38,5 +38,5 @@ module.enable = function(self)
         tMinimapZoomOut:SetPoint("TOPRIGHT", MinimapZoneText, "TOPLEFT", 160*scaletMinimapZoomInOut, -210*scaletMinimapZoomInOut)
     end
 
-    MinimapClock:SetPoint("TOPRIGHT", Minimap, 25, 42)
+    if not tDFUI.IsPlaced("MinimapClock") then MinimapClock:SetPoint("TOPRIGHT", Minimap, 25, 42) end
 end

@@ -38,9 +38,7 @@
 
 local _G = tDFUI.GetGlobalEnv()
 
-local function Print(msg)
-  DEFAULT_CHAT_FRAME:AddMessage("|cff008000t|cff1974d2DF|r: " .. msg)
-end
+local Print = tDFUI.Print
 
 local function Now()
   local ok, stamp = pcall(date, "%Y-%m-%d %H:%M:%S")

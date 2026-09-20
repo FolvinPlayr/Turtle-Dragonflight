@@ -119,39 +119,51 @@ module.enable = function(self)
     -- run original function
     hookUIParent_ManageFramePositions(a1, a2, a3)
 
+    -- Each of these is skipped for a frame Edit Mode holds a position for.
+    -- This hook runs on every layout pass, so without the check it drags a
+    -- hand-placed bar straight back where it was.
+
     -- move top actionbar if xp or reputation is tracked
-    MultiBarBottomLeft:ClearAllPoints()
-    if MainMenuExpBar:IsVisible() or ReputationWatchBar:IsVisible() then
-      local anchor = GetWatchedFactionInfo() and ReputationWatchBar or MainMenuExpBar
-      MultiBarBottomLeft:SetPoint("BOTTOM", anchor, "TOP", 0, 3)
-    else
-      MultiBarBottomLeft:SetPoint("BOTTOM", MainMenuBar, "TOP", 0, -3)
+    if not tDFUI.IsPlaced("MultiBarBottomLeft") then
+      MultiBarBottomLeft:ClearAllPoints()
+      if MainMenuExpBar:IsVisible() or ReputationWatchBar:IsVisible() then
+        local anchor = GetWatchedFactionInfo() and ReputationWatchBar or MainMenuExpBar
+        MultiBarBottomLeft:SetPoint("BOTTOM", anchor, "TOP", 0, 3)
+      else
+        MultiBarBottomLeft:SetPoint("BOTTOM", MainMenuBar, "TOP", 0, -3)
+      end
     end
 
     -- move pet actionbar above other actionbars
-    PetActionBarFrame:ClearAllPoints()
-    local anchor = MainMenuBarArtFrame
-    anchor = MultiBarBottomLeft:IsVisible() and MultiBarBottomLeft or anchor
-    anchor = MultiBarBottomRight:IsVisible() and MultiBarBottomRight or anchor
-    PetActionBarFrame:SetPoint("BOTTOM", anchor, "TOP", 0, 3)
+    if not tDFUI.IsPlaced("PetActionBarFrame") then
+      PetActionBarFrame:ClearAllPoints()
+      local anchor = MainMenuBarArtFrame
+      anchor = MultiBarBottomLeft:IsVisible() and MultiBarBottomLeft or anchor
+      anchor = MultiBarBottomRight:IsVisible() and MultiBarBottomRight or anchor
+      PetActionBarFrame:SetPoint("BOTTOM", anchor, "TOP", 0, 3)
+    end
 
     -- ShapeshiftBarFrame
-    ShapeshiftBarFrame:ClearAllPoints()
-    local offset = 0
-    local anchor = ActionButton1
-    anchor = MultiBarBottomLeft:IsVisible() and MultiBarBottomLeft or anchor
-    anchor = MultiBarBottomRight:IsVisible() and MultiBarBottomRight or anchor
+    if not tDFUI.IsPlaced("ShapeshiftBarFrame") then
+      ShapeshiftBarFrame:ClearAllPoints()
+      local offset = 0
+      local anchor = ActionButton1
+      anchor = MultiBarBottomLeft:IsVisible() and MultiBarBottomLeft or anchor
+      anchor = MultiBarBottomRight:IsVisible() and MultiBarBottomRight or anchor
 
-    offset = anchor == ActionButton1 and ( MainMenuExpBar:IsVisible() or ReputationWatchBar:IsVisible() ) and 6 or 0
-    offset = anchor == ActionButton1 and offset + 6 or offset
-    ShapeshiftBarFrame:SetPoint("BOTTOMLEFT", anchor, "TOPLEFT", -10, 2 + offset)
+      offset = anchor == ActionButton1 and ( MainMenuExpBar:IsVisible() or ReputationWatchBar:IsVisible() ) and 6 or 0
+      offset = anchor == ActionButton1 and offset + 6 or offset
+      ShapeshiftBarFrame:SetPoint("BOTTOMLEFT", anchor, "TOPLEFT", -10, 2 + offset)
+    end
 
     -- move castbar ontop of other bars
-    local anchor = MainMenuBarArtFrame
-    anchor = MultiBarBottomLeft:IsVisible() and MultiBarBottomLeft or anchor
-    anchor = MultiBarBottomRight:IsVisible() and MultiBarBottomRight or anchor
-    local pet_offset = PetActionBarFrame:IsVisible() and 40 or 0
-    CastingBarFrame:SetPoint("BOTTOM", anchor, "TOP", 0, 50 + pet_offset)
+    if not tDFUI.IsPlaced("CastingBarFrame") then
+      local anchor = MainMenuBarArtFrame
+      anchor = MultiBarBottomLeft:IsVisible() and MultiBarBottomLeft or anchor
+      anchor = MultiBarBottomRight:IsVisible() and MultiBarBottomRight or anchor
+      local pet_offset = PetActionBarFrame:IsVisible() and 40 or 0
+      CastingBarFrame:SetPoint("BOTTOM", anchor, "TOP", 0, 50 + pet_offset)
+    end
   end
 
   -- enable picking up/replacing bags by clicking on the container frame portrait

@@ -40,6 +40,11 @@ for _, barName in pairs({"MainMenuBar", "BonusActionBarFrame"}) do
     -- Show the frame
     Leftframe:Show()
     Rightframe:Show()
+
+    -- shared handle so mods\tBarLayout.lua can hide this artwork when the bar
+    -- is reshaped into a grid the 12-in-a-row art cannot possibly fit
+    tDFActionBarArt = tDFActionBarArt or {}
+    tDFActionBarArt[barName] = { left = Leftframe, right = Rightframe }
 end
 
 -- Set the strata of all ActionButtons to be above your frame

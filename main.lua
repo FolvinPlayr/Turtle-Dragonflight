@@ -46,7 +46,10 @@ tDFUI.errors = {}
   -- every mod after it lost both its config entry and its options-menu
   -- checkbox, so it looked like those features had vanished entirely.
   for title, mod in pairs(tDFUI.mods) do
-    if not tDFUI_config[title] then
+    if mod.hidden then
+      -- infrastructure modules have no checkbox and are always on
+      tDFUI_config[title] = 1
+    elseif not tDFUI_config[title] then
       tDFUI_config[title] = mod.enabled and 1 or 0
     end
   end
@@ -64,8 +67,7 @@ tDFUI.errors = {}
 
   local failed = table.getn(tDFUI.errors)
   if failed > 0 then
-    DEFAULT_CHAT_FRAME:AddMessage("|cff008000t|cff1974d2DF|r: " .. failed ..
-      " module(s) failed to load. Type |cffffff00/tdf|r for details.")
+    tDFUI.Print(failed .. " module(s) failed to load. Type |cffffff00/tdf|r for details.")
   end
 end)
 
@@ -83,11 +85,20 @@ SlashCmdList.TDFUI = function(msg)
     return
   end
 
+  if subcommand and strlower(subcommand) == "edit" then
+    if tDF_EditModeCommand then
+      tDF_EditModeCommand(args)
+    else
+      tDFUI.Print("Edit Mode is not enabled.")
+    end
+    return
+  end
+
   if subcommand and strlower(subcommand) == "dict" then
     if tDF_SpellcheckCommand then
       tDF_SpellcheckCommand(args)
     else
-      DEFAULT_CHAT_FRAME:AddMessage("|cff008000t|cff1974d2DF|r: Chat Spellcheck is not loaded.")
+      tDFUI.Print("Chat Spellcheck is not loaded.")
     end
     return
   end

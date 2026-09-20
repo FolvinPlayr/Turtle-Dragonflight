@@ -6,9 +6,18 @@ MainMenuBarRightEndCap:Hide()
 leftGryphonFrame = CreateFrame("Frame", nil, MainMenuBar)
 rightGryphonFrame = CreateFrame("Frame", nil, MainMenuBar)
 
--- Set the new frames to a higher strata
-leftGryphonFrame:SetFrameStrata("HIGH")
-rightGryphonFrame:SetFrameStrata("HIGH")
+-- The endcaps need to draw over the action bar art and the buttons, but NOT
+-- over the game's panels. "HIGH" put them above the bag, character, escape and
+-- tDF options frames, so a gryphon moved up the screen covered whatever window
+-- was open underneath it. "MEDIUM" is where tMainActionBar.lua puts the action
+-- buttons, so a frame level above those keeps the art on top of the bar while
+-- every panel still draws over it.
+leftGryphonFrame:SetFrameStrata("MEDIUM")
+rightGryphonFrame:SetFrameStrata("MEDIUM")
+
+local buttonlevel = ActionButton1 and ActionButton1:GetFrameLevel() or 5
+leftGryphonFrame:SetFrameLevel(buttonlevel + 5)
+rightGryphonFrame:SetFrameLevel(buttonlevel + 5)
 
 -- Create new textures
 local leftGryphon = leftGryphonFrame:CreateTexture(nil, "OVERLAY")

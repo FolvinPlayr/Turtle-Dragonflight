@@ -104,6 +104,33 @@
   MultiBarBottomRight:SetPoint("BOTTOM", MultiBarBottomLeft, "TOP", 0, 5)
   MultiBarBottomLeft:SetFrameStrata("LOW")
 
+  -- Stance bar ticker, created ONCE for the whole session.
+  --
+  -- This used to be built inside the layout hook below, so every zone change,
+  -- every bar toggle and every Edit Mode reset added another OnUpdate handler
+  -- to the pile. Each one captured the anchor and offset from the pass that
+  -- created it, and all of them then re-anchored the same frame every frame
+  -- with different answers - so the stance bar jittered between old positions
+  -- and refused to sit where it was put.
+  --
+  -- It also uses SetPoint without clearing first, deliberately: once Edit Mode
+  -- has given the frame a TOPLEFT anchor, adding a BOTTOMLEFT one alongside it
+  -- stretches the bar between the two and draws it nowhere near where the
+  -- editor says it is. The IsPlaced check is what keeps that from happening.
+  local shapeAnchor, shapeOffset
+  local ShapeFrame = CreateFrame("Frame")
+
+  ShapeFrame:SetScript("OnUpdate", function()
+    if not shapeAnchor then return end
+    if tDFUI.IsPlaced("ShapeshiftBarFrame") then return end
+
+    if MultiBarBottomRightButton1 then
+      ShapeshiftBarFrame:SetPoint("BOTTOMLEFT", shapeAnchor, "TOPLEFT", -10, 10 + shapeOffset)
+    else
+      ShapeshiftBarFrame:SetPoint("BOTTOMLEFT", shapeAnchor, "TOPLEFT", -10, 2 + shapeOffset)
+    end
+  end)
+
   -- reload custom frame positions after original frame manage runs
   local hookUIParent_ManageFramePositions = UIParent_ManageFramePositions
   UIParent_ManageFramePositions = function(a1, a2, a3)
@@ -116,31 +143,43 @@
    -- MainMenuBar:ClearAllPoints()
    if MainMenuExpBar:IsVisible() or ReputationWatchBar:IsVisible() then
 	local anchor = GetWatchedFactionInfo() and ReputationWatchBar or MainMenuExpBar
-	
-	MainMenuBar:SetPoint("BOTTOM", WorldFrame, "BOTTOM", 0, 28)
+
+	if not tDFUI.IsPlaced("MainMenuBar") then
+	  MainMenuBar:SetPoint("BOTTOM", WorldFrame, "BOTTOM", 0, 28)
+	end
 	MainMenuBarLeftEndCap:SetPoint("RIGHT", MainMenuBarArtFrame, "LEFT", 26, 10)
 	MainMenuBarRightEndCap:SetPoint("LEFT", MainMenuBarArtFrame, "RIGHT", -26, 10)
     else
-      MainMenuBar:SetPoint("BOTTOM", WorldFrame, "BOTTOM", 0, 13)
+      if not tDFUI.IsPlaced("MainMenuBar") then
+        MainMenuBar:SetPoint("BOTTOM", WorldFrame, "BOTTOM", 0, 13)
+      end
 	MainMenuBarLeftEndCap:SetPoint("RIGHT", MainMenuBarArtFrame, "LEFT", 26, 25)
 	MainMenuBarRightEndCap:SetPoint("LEFT", MainMenuBarArtFrame, "RIGHT", -26, 25)
 	MainMenuBarMaxLevelBar:SetAlpha(0)
     end
 
-	MainMenuExpBar:ClearAllPoints()
-	MainMenuExpBar:SetPoint("BOTTOM", WorldFrame, "BOTTOM", 0, 2)
+	if not tDFUI.IsPlaced("MainMenuExpBar") then
+	  MainMenuExpBar:ClearAllPoints()
+	  MainMenuExpBar:SetPoint("BOTTOM", WorldFrame, "BOTTOM", 0, 2)
+	end
 
-	MultiBarBottomLeft:ClearAllPoints()
-	MultiBarBottomLeft:SetPoint("BOTTOM", MainMenuBar, "TOP", 3, -5)
+	if not tDFUI.IsPlaced("MultiBarBottomLeft") then
+	  MultiBarBottomLeft:ClearAllPoints()
+	  MultiBarBottomLeft:SetPoint("BOTTOM", MainMenuBar, "TOP", 3, -5)
+	end
 	ReputationWatchStatusBar:ClearAllPoints()
 	ReputationWatchStatusBar:SetPoint("BOTTOM", WorldFrame, "BOTTOM", 0, 2)
 	
 -- move pet actionbar above other actionbars
-PetActionBarFrame:ClearAllPoints()
+if not tDFUI.IsPlaced("PetActionBarFrame") then
+  PetActionBarFrame:ClearAllPoints()
+end
 local anchor = MainMenuBarArtFrame
 
 -- Create a function to update the anchor and position of PetActionBarFrame
 local function updatePetActionBarPosition()
+    if tDFUI.IsPlaced("PetActionBarFrame") then return end
+
     if MultiBarBottomRight:IsVisible() then
         anchor = MultiBarBottomRight
     elseif MultiBarBottomLeft:IsVisible() then
@@ -160,7 +199,6 @@ MultiBarBottomLeft:SetScript("OnHide", updatePetActionBarPosition)
 
 
     -- ShapeshiftBarFrame
-    ShapeshiftBarFrame:ClearAllPoints()
     local offset = 0
     local anchor = MultiBarBottomLeftButton1
     anchor = MultiBarBottomLeft:IsVisible() and MultiBarBottomLeft or anchor
@@ -168,27 +206,25 @@ MultiBarBottomLeft:SetScript("OnHide", updatePetActionBarPosition)
 
     offset = anchor == ActionButton1 and ( MainMenuExpBar:IsVisible() or ReputationWatchBar:IsVisible() ) and 6 or 0
     offset = anchor == ActionButton1 and offset + 6 or offset
-    ShapeshiftBarFrame:SetPoint("BOTTOMLEFT", anchor, "TOPLEFT", -10, 2 + offset)
 
--- new to support 3rd bar
--- Create a frame
-local ShapeFrame = CreateFrame("Frame")
-
--- Set the OnUpdate script
-ShapeFrame:SetScript("OnUpdate", function(self, elapsed)
-    if MultiBarBottomRightButton1 then
-        ShapeshiftBarFrame:SetPoint("BOTTOMLEFT", anchor, "TOPLEFT", -10, 10 + offset)
-    else
-        ShapeshiftBarFrame:SetPoint("BOTTOMLEFT", anchor, "TOPLEFT", -10, 2 + offset)
+    if not tDFUI.IsPlaced("ShapeshiftBarFrame") then
+      ShapeshiftBarFrame:ClearAllPoints()
+      ShapeshiftBarFrame:SetPoint("BOTTOMLEFT", anchor, "TOPLEFT", -10, 2 + offset)
     end
-end)
+
+    -- hand this pass's anchor to the single ticker created above, rather than
+    -- spawning another one that will argue with it
+    shapeAnchor, shapeOffset = anchor, offset
 
     -- move castbar ontop of other bars
     local anchor = MainMenuBarArtFrame
     anchor = MultiBarBottomLeft:IsVisible() and MultiBarBottomLeft or anchor
     anchor = MultiBarBottomRight:IsVisible() and MultiBarBottomRight or anchor
     local pet_offset = PetActionBarFrame:IsVisible() and 40 or 0
-    CastingBarFrame:SetPoint("BOTTOM", anchor, "TOP", 0, 50 + pet_offset)
+
+    if not tDFUI.IsPlaced("CastingBarFrame") then
+      CastingBarFrame:SetPoint("BOTTOM", anchor, "TOP", 0, 50 + pet_offset)
+    end
   end
 
 MainMenuExpBar:SetAlpha(0) --Required for tXPbar.lua to work

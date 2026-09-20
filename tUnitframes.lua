@@ -237,8 +237,12 @@ local class = { r = 0, g = 1, b = 0, a = 1 }
     new_PetFrame_Update()
     PetFrameTexture:SetTexture("Interface\\Addons\\Turtle-Dragonflight\\img\\pet")
     PetFrameTexture:SetDrawLayer("BACKGROUND") -- Set the draw layer of the texture
-    PetFrame:ClearAllPoints()
-    PetFrame:SetPoint("BOTTOM", PlayerFrame, -10, -30)
+    -- PetFrame_Update runs on every pet update, so re-anchoring unconditionally
+    -- here undid an Edit Mode position moments after it was set
+    if not tDFUI.IsPlaced("PetFrame") then
+      PetFrame:ClearAllPoints()
+      PetFrame:SetPoint("BOTTOM", PlayerFrame, -10, -30)
+    end
     -- Change the frame strata of the HealthBar and ManaBar
 
     --PetFrameHealthBar:SetFrameStrata("MEDIUM")

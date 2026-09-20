@@ -1,8 +1,8 @@
 # 🐢 🐉 tDF (Turtle Dragonflight)
-![GitHub Release](https://img.shields.io/github/v/release/TheLinuxITGuy/Turtle-Dragonflight?style=for-the-badge&labelColor=%231A365D&color=%23E9FC12)
 
 
-## MASSIVE THANKS TO THE ORIGINAL DEV TheLinuxITGuy, THIS IS AN UNOFICIAL CONTINUATION/UPDATED FORK FOR PAST 1.18 FOR OCTOWOW, MADE BY FOLVIN, AS THE ORIGINAL DEVELOPER STOPPED UPDATING THE MOD!
+
+Massive THANKS to the original dev TheLinuxITGuy, this is a continuation fork for the mod to work past 1.18 OctoWoW, made with much love, by Folvin!
 
 
 ## 🌟 Grateful to All past Contributors
